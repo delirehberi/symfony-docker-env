@@ -1,0 +1,41 @@
+phpfpm:
+  container_name: php_workshop
+  image: delirehberi/php7-symfony
+  tty: true
+  volumes:
+    - /var/www/:/var/www
+    - ./php.ini:/usr/local/etc/php/php.ini
+    - ./php-fpm.conf:/user/local/etc/php-fpm.d/www.conf
+  volumes_from:
+    - data
+  links:
+    - postgres
+nginx:
+  container_name: nginx_workshop
+  image: nginx
+  volumes_from:
+    - data
+  volumes:
+    - /var/www/:/var/www
+    - ./nginx.conf:/etc/nginx/nginx.conf
+    - ./nginx-servers:/etc/nginx/servers
+  ports:
+    - "80:80"
+  links:
+    - phpfpm
+postgres:
+  container_name: postgres_workshop
+  image: postgres:9
+  environment:
+    POSTGRES_PASSWORD: symfony
+    POSTGRES_DB: symfony
+    POSTGRES_USER: symfony
+  volumes_from:
+    - data
+data:
+  container_name: busybox_workshop
+  image: busybox
+  volumes:
+    - /var/lib/postgresql/data
+  tty: true
+  stdin_open: true
